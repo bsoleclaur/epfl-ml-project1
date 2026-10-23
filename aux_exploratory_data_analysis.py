@@ -1,6 +1,61 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+def split_data(x, y, ratiotrain =0.7, ratiovalidation=0.15, seed=1):
+
+    """Split the dataset based on the split ratio (e.g. 0.8 for 80% train, 20% test).
+    
+    Parameters
+    ----------
+    x : np.ndarray
+        Input feature matrix (n_samples, n_features)
+    y : np.ndarray
+        Target values (n_samples,)
+    ratiotest : float
+        Split ratio for test data (default: 0.7)
+    ratiovalidation : float
+        Split ratio for validation data (default: 0.15)
+    seed : int
+        Random seed for reproducibility (default: 1)
+
+    Returns
+    -------
+    x_train : np.ndarray
+        Training feature matrix
+    x_test : np.ndarray
+        Test feature matrix
+    x_validation: np.ndarray
+        Validation feature matrix
+    y_train : np.ndarray
+        Validation target values
+    y_train : np.ndarray
+        Training target values
+    y_test : np.ndarray
+        Test target values
+    """
+
+    
+
+    # Set seed for reproducibility
+    np.random.seed(seed)
+    
+    num_samples = len(y)
+    indices = np.random.permutation(num_samples)
+    
+    # Calculate split boundary index
+    train_boundary = int(np.floor(ratiotrain * num_samples))
+    validation_boundary = int(np.floor((ratiotrain + ratiovalidation) * num_samples))
+    
+    train_indices = indices[:train_boundary]
+    validation_indices = indices[train_boundary:validation_boundary]
+    test_indices = indices[validation_boundary:]
+    
+    x_train, x_validation, x_test = x[train_indices], x[validation_indices], x[test_indices]
+    y_train, y_validation, y_test = y[train_indices], y[validation_indices], y[test_indices]
+
+    return x_train, x_validation, x_test, y_train, y_validation, y_test
+
+
 #NaN analysis
 def nan_count(X, plot=False):
     """
@@ -250,3 +305,4 @@ def summarize_outliers(outlier_mask, num_mask, plot=False):
         plt.show()
 
     return outlier_pctg
+

@@ -20,6 +20,7 @@ def remove_nan_feat(X, threshold=0.3):
     return keep_mask
 
 def remove_outliers_feat(X, num_mask, threshold_IQR=1.5, threshold_out=0.3):
+
     """
     Remove columns (features) with more than `threshold` proportion of NaN values.
     """
@@ -356,6 +357,35 @@ def feature_target_correlation(X, y, threshold_elimination=0.01):
     mask = np.abs(corr) >= threshold_elimination
     return mask
 
+def target_correlations (X, y):
+    """Computes Pearson correlation between each feature and the target y
+        and returns a boolean mask indicating features with |correlation| above threshold.
+    
+        Parameters
+        ----------
+        X : np.ndarray
+            Data matrix (n_samples, n_features)
+        y : np.ndarray
+            Target vector (n_samples,)
+        threshold_elimination : float
+            Threshold below which features are considered uncorrelated
+    
+        Returns
+        -------
+        mask : np.ndarray
+            Boolean array of length n_features (1 if |corr| >= threshold, 0 otherwise)
+        """
+    Xc = X - np.mean(X, axis=0)
+    yc = y - np.mean(y)
+    num = np.sum(Xc * yc[:, None], axis=0)
+    denom = np.sqrt(np.sum(Xc ** 2, axis=0) * np.sum(yc ** 2))
+    corr = np.zeros(X.shape[1])
+    valid = denom > 0
+    corr[valid] = num[valid] / denom[valid]
+    return corr
+
+    
+
 def correlation_matrix(X):
     """
     Computes the Pearson correlation matrix between all features.
@@ -391,3 +421,40 @@ def tvalues_logreg_penalized(w, X, y, lam, pos_weight=1.0, neg_weight=1.0):
     se = 1 / np.sqrt(H_diag)
     t_vals = (w.flatten() / se)
     return ((t_vals[1:] > 2) | (t_vals[1:] < -2))
+
+
+def filter_colinear_features(X, y, threshold=0.9):
+    """
+    Removes features that are highly correlated with each other.
+
+    Parameters
+    ----------
+    X : np.ndarray
+        Data matrix (n_samples, n_features)
+    threshold : float
+        Correlation threshold above which features are considered collinear.
+
+    Returns
+    -------
+    keep_mask : np.ndarray
+        Boolean mask indicating which features to keep (True) and which to drop (False).
+    """
+    corr_mat = correlation_matrix(X)
+    corr = target_correlations (X, y)
+    d = X.shape[1]
+    keep_mask = np.ones(d, dtype=bool)
+
+    for i in range(d):
+        if not keep_mask[i]:
+            continue
+        for j in range(i + 1, d):
+            if not keep_mask[j]:
+                continue
+            if abs(corr_mat[i, j]) > threshold:
+                if (abs(corr[i]) >= abs(corr[j])):
+                    keep_mask[j] = False
+                else:
+                    keep_mask[i] = False
+                    break
+
+    return keep_mask
