@@ -16,16 +16,25 @@ def compute_gradient(y, tx, w):
     gradient = -(1 / N) * (tx.T @ e)
     return gradient
 
-def mean_squared_error_gd(y, tx, initial_w, max_iters, gamma):
+def mean_squared_error_gd(y, x, initial_w, max_iters, gamma,tol = 1e-8):
     """Linear regression using gradient descent."""
     w = np.copy(initial_w)
-
+    tx = np.c_[np.ones((x.shape[0], 1)), x]
+    losses = []
     for n_iter in range(max_iters):
         gradient = compute_gradient(y, tx, w)
         w = w - gamma * gradient
-    loss = compute_loss(y, tx, w)
+        loss = compute_loss(y, tx, w)
+        losses.append(loss)
 
-    return w, loss
+        if n_iter > 0 and abs(losses[-1] - losses[-2]) < tol:
+                print(f"Converged at iteration {n_iter}")
+                break
+       
+        if n_iter % 100 == 0:
+            print(f"Iter {n_iter:5d} | Loss = {loss:.6f} | Grad = {np.linalg.norm(gradient):.4f}")
+       
+    return w, losses[-1]
 
 def mean_squared_error_sgd(y, tx, initial_w, max_iters, gamma):
     """Linear regression using stochastic gradient descent (batch size = 1)."""
@@ -43,14 +52,14 @@ def mean_squared_error_sgd(y, tx, initial_w, max_iters, gamma):
     return w, loss
 
 
-def least_squares(y, tx):
+def least_squares(y, x):
     """Least squares regression using normal equations."""
-    N = len(y) 
+    tx = np.c_[np.ones((x.shape[0], 1)), x]
     A = tx.T @ tx
     b = tx.T @ y
     
     w = np.linalg.solve(A,b)
-    e = y - tx @ w
+    
     loss = compute_loss(y, tx, w)
     return w, loss
 
@@ -87,16 +96,26 @@ def calculate_gradient_logistic(y,tx,w):
     return grad
      
 
-def logistic_regression(y, tx, initial_w, max_iters, gamma):
+def logistic_regression(y, x, initial_w, max_iters, gamma,tol=1e-8):
     """Logistic regression using gradient descent."""
     w = np.copy(initial_w)
+    tx = np.c_[np.ones((x.shape[0], 1)), x]
+    losses = []
     
     for n_iter in range(max_iters):
         grad = calculate_gradient_logistic(y,tx,w)
         w = w - gamma*grad
-    
-    L = calculate_loss(y,tx,w)
-    return w, L 
+        loss = calculate_loss_logistic(y, tx, w)
+        losses.append(loss)
+        if n_iter > 0 and abs(losses[-1] - losses[-2]) < tol:
+            print(f"Converged at iteration {n_iter}")
+            break
+   
+        if n_iter % 100 == 0:
+            print(f"Iter {n_iter:5d} | Loss = {loss:.6f} | Grad = {np.linalg.norm(grad):.4f}")
+   
+    return w, losses[-1]
+
 
 def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
     """Regularized logistic regression using gradient descent."""
