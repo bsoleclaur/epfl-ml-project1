@@ -19,20 +19,22 @@ This project implements machine learning algorithms from scratch using NumPy to 
 ---
 
 ## Repository Structure
-
+```text
+.
 ├── data/
-|   ├── sample_submission.csv          # Training feature
-│   ├── x_train.csv                    # Training feature matrix
-│   ├── y_train.csv                    # Training targets {-1, 1}
-│   └── x_test.csv                     # Test feature matrix
-├── aux_cleaning_functions.py          # Required 6 EPFL algorithm functions
-├── aux_explanatory_data_analysis.py   # Required 6 EPFL algorithm functions
-├── aux_grid_search.py                 # Required 6 EPFL algorithm functions
-├── aux_preprocessing.py               # Required 6 EPFL algorithm functions
-├── helpers.py                         # Required 6 EPFL algorithm functions
-├── implementations.py                 # Required 6 EPFL algorithm functions
-├── run.ipynb                   # End-to-end pipeline script to build submission.csv
-├── dataanalysis.ipynb        # Exploratory Data Analysis & Grid Search experiments
-├── model_logistic_basic.ipynb        # Grid Search experiments for Logistic Regression
-├── model_regression.ipynb        # Grid Search experiments for Regression
-└── README.md                # Project documentation
+│   ├── sample_submission.csv        # Sample submission format
+│   ├── x_train.csv                  # Training feature matrix
+│   ├── y_train.csv                  # Training targets {-1, 1}
+│   └── x_test.csv                   # Test feature matrix
+├── aux_cleaning_functions.py        # Helper functions for NaN & outlier removal
+├── aux_explanatory_data_analysis.py # Helper functions for plotting & EDA
+├── aux_grid_search.py               # Grid search hyperparameter tuning logic
+├── aux_preprocessing.py             # Imputation, standardization & OHE helpers
+├── helpers.py                       # EPFL project I/O helper functions
+├── implementations.py               # 6 required EPFL algorithm implementations
+├── run.ipynb                        # Main pipeline generating submission.csv
+├── dataanalysis.ipynb               # Exploratory Data Analysis experiments
+├── model_logistic_basic.ipynb       # Logistic Regression experiment notebook
+├── model_regression.ipynb           # Least Squares experiment notebook
+└── README.md                        # Project documentation
+```
