@@ -39,7 +39,7 @@ def weighted_gradient_logistic(y, tx, w, lambda_=0.0, pos_weight=1.0, neg_weight
 
 def logistic_regression_weighted_gd(
     y, x, lambda_=1e-3, gamma=0.05, pos_weight=1.0, neg_weight=1.0,
-    max_iter=10000, tol=1e-8, clip_grad=10.0, verbose=True
+    max_iter=10000, tol=1e-4, clip_grad=10.0, verbose=True
 ):
     """
     Logistic regression with class weights and L2 regularization.
@@ -76,6 +76,13 @@ def predict_with_threshold(x, w, threshold=0.5):
     preds = (probs >= threshold).astype(int)
     return preds, probs
 
+def predict_linear (x, w, threshold = 0.5):
+
+    tx = np.c_[np.ones((x.shape[0], 1)), x]
+    predictions = x@w
+    preds = (predictions >= threshold).astype(int)
+    return preds
+
 def f1_score(y_true, y_pred):
     """
     Compute F1 score using only NumPy.
@@ -92,6 +99,7 @@ def f1_score(y_true, y_pred):
     recall = tp / (tp + fn + 1e-15)
     f1 = 2 * precision * recall / (precision + recall + 1e-15)
     return f1
+
 
 def accuracy_numpy(y_true, y_pred):
     """

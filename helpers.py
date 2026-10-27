@@ -7,7 +7,8 @@ import os
 
 def load_csv_data(data_path, sub_sample=False):
     """
-    This function loads the data and returns the respectinve numpy arrays.
+    This function loads the data and returns the respective numpy arrays.
+    
     Remember to put the 3 files in the same folder and to not change the names of the files.
 
     Args:

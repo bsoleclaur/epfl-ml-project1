@@ -85,7 +85,9 @@ def calculate_loss_logistic(y,tx,w):
     assert tx.shape[1] == w.shape[0]
 
     N = len(y)
+    eps = 1e-15
     pred = sigmoid(tx @ w)
+    pred = np.clip(pred, eps, 1.0 - eps)
     L = (-1 / N) * np.sum(y * np.log(pred) + (1 - y) * np.log(1 - pred))
     return float(L)
 
