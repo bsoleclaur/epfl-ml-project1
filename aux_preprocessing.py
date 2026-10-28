@@ -101,12 +101,6 @@ def f1_score(y_true, y_pred):
     return f1
 
 
-def accuracy_numpy(y_true, y_pred):
-    """
-    Compute accuracy.
-    """
-    return np.mean(y_true == y_pred)
-
 
 # --- Full evaluation wrapper ---
 def evaluate_model(y_true, X, w, threshold=0.5):
@@ -121,7 +115,21 @@ def evaluate_model(y_true, X, w, threshold=0.5):
     print(f" F1 Score: {f1:.4f}")
     return acc, f1
 
-def confusion_matrix_numpy(y_true, y_pred, plot=True):
+def accuracy_numpy(y_true, y_pred):
+    """
+    Compute accuracy.
+    """
+    return np.mean(y_true == y_pred)
+
+def recall_numpy (y_true, y_pred):
+    tp = np.sum((y_true == 1) & (y_pred == 1))
+    fp = np.sum ((y_true == 0) & (y_pred == 1))
+    fn = np.sum ((y_true == 1) & (y_pred == 0))
+
+    recall = tp / (tp + fn) if (tp + fn) > 0 else 0.0
+    return recall
+
+def confusion_matrix_numpy(y_true, y_pred, method = "Weighted", plot=True):
     """
     Compute and optionally plot the confusion matrix using NumPy.
 
@@ -157,7 +165,7 @@ def confusion_matrix_numpy(y_true, y_pred, plot=True):
     if plot:
         plt.figure(figsize=(4, 3))
         plt.imshow(cm, cmap="Blues")
-        plt.title("Confusion Matrix")
+        plt.title(f"Confusion Matrix {method}")
         plt.xlabel("Predicted label")
         plt.ylabel("True label")
         plt.xticks([0, 1], ["0", "1"])

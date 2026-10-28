@@ -224,6 +224,7 @@ def grid_search_logistic_wheight(
         X_tr_base = X_train.copy()
         y_tr_base = y_train.copy()
         X_val_base = X_val.copy()
+        y_val_base = y_val.copy()
 
         #Remove the nans
         keep_mask = remove_nan_feat(X_tr_base, threshold= thr_nans)
@@ -290,9 +291,9 @@ def grid_search_logistic_wheight(
                             continue
                         for th in thresholds:
                             preds, _ = predict_with_threshold(X_thr_val, w, threshold=th)
-                            fbeta = f_beta_score(y_val, preds)
+                            fbeta = f_beta_score(y_val_base, preds)
                             results.append((thr_nans, meth, gamma,None, None, th, fbeta))
-                        
+                            
                             if fbeta > best_fbeta:
                                 best_fbeta = fbeta
                                 best_params = (thr_nans,meth, gamma, None, None, th)
@@ -322,9 +323,9 @@ def grid_search_logistic_wheight(
                                 # Evaluate all thresholds for this model
                                 for th in thresholds:
                                     preds, _ = predict_with_threshold(X_thr_val, w, threshold=th)
-                                    fbeta = f_beta_score(y_val, preds)
+                                    fbeta = f_beta_score(y_val_base, preds)
                                     results.append((thr_nans, meth, gamma, pw, lam, th, fbeta))
-
+                                    
                                     if fbeta > best_fbeta:
                                         best_fbeta = fbeta
                                         best_params = (thr_nans,meth, gamma, pw, lam, th)
