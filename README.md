@@ -1,4 +1,4 @@
-# EPFL Machine Learning - Project 1 
+
 
 ## Group Members
 * **Member 1**: Marc Sempere Ayala 
