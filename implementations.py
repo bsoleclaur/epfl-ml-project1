@@ -33,8 +33,9 @@ def mean_squared_error_gd(y, x, initial_w, max_iters, gamma,tol = 1e-8):
        
         if n_iter % 100 == 0:
             print(f"Iter {n_iter:5d} | Loss = {loss:.6f} | Grad = {np.linalg.norm(gradient):.4f}")
-       
-    return w, losses[-1]
+
+    loss = compute_loss(y, tx, w)
+    return w, loss
 
 def mean_squared_error_sgd(y, tx, initial_w, max_iters, gamma):
     """Linear regression using stochastic gradient descent (batch size = 1)."""
@@ -115,8 +116,9 @@ def logistic_regression(y, x, initial_w, max_iters, gamma,tol=1e-8):
    
         if n_iter % 100 == 0:
             print(f"Iter {n_iter:5d} | Loss = {loss:.6f} | Grad = {np.linalg.norm(grad):.4f}")
-   
-    return w, losses[-1]
+
+    loss = calculate_loss_logistic(y, tx, w)
+    return w, loss
 
 
 def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
@@ -128,6 +130,8 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
         pred = sigmoid(tx @ w)
         gradient = (1 / N) * tx.T @ (pred - y)  + 2*lambda_*w
         w = w - gamma*gradient
-    loss = float((-1 / N) * np.sum(y * np.log(pred) + (1 - y) * np.log(1 - pred))) 
+        
+    log_loss = calculate_loss_logistic(y, tx, w)
+    loss = log_loss + lambda_ * np.sum(w**2) 
     return w, loss
     
