@@ -14,10 +14,10 @@ To select the best model we compared diferent prediction algorithms, we started 
 Comparing with F2 score we reached to our best model parameters and we calaulate the final prediction results. 
 
 ### Best Performing Model & Results
-* **Model**: Logistic Regression
-* **Validation F1-Score**: 0.XX
-* **Validation Accuracy**: XX.X%
-* **Optimal Decision Threshold**: 0.XX
+* **Model**: Undersample Logistic Regression
+* **Validation F2-Score**: 0.5473
+* **Validation Accuracy**: 76.05%
+* **Optimal Decision Threshold**: 0.5
 
 ---
 
