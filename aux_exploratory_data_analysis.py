@@ -6,7 +6,7 @@ def split_data(x, y, ratiotrain=0.7, ratiovalidation=0.15, seed=1):
 
     """
         Split the dataset based on the split ratio (e.g. 75% train, 15% test and 15% validation).
-    
+
     Parameters
     ----------
     x : np.ndarray

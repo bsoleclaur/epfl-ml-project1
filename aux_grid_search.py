@@ -237,7 +237,6 @@ def grid_search_logistic_regression_base(
     return best_params, best_f1, results
 
 
-
 def grid_search_logistic_wheight(
     y_train,
     X_train,
