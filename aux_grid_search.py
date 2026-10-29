@@ -237,7 +237,7 @@ def grid_search_logistic_regression_base(
     return best_params, best_f1, results
 
 
-## S'ha de corretgir!!!! ( potser millor copiar la que tenia el jan i  començar de 0)
+
 def grid_search_logistic_wheight(
     y_train,
     X_train,
