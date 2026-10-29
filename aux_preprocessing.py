@@ -4,10 +4,12 @@ from aux_cleaning_functions import *
 from aux_exploratory_data_analysis import detect_categorical_features
 from implementations import *
 
+
 def sigmoid(z):
     """Numerically stable sigmoid."""
     z = np.clip(z, -500, 500)
     return 1 / (1 + np.exp(-z))
+
 
 def weighted_logistic_loss(y, tx, w, pos_weight=1.0, neg_weight=1.0):
     """
@@ -20,8 +22,10 @@ def weighted_logistic_loss(y, tx, w, pos_weight=1.0, neg_weight=1.0):
     sample_weights = np.where(y == 1, pos_weight, neg_weight)
 
     # weighted average loss
-    loss = -np.sum(sample_weights * (y * np.log(p + eps) + (1 - y) * np.log(1 - p + eps))) / np.sum(sample_weights)
-    
+    loss = -np.sum(
+        sample_weights * (y * np.log(p + eps) + (1 - y) * np.log(1 - p + eps))
+    ) / np.sum(sample_weights)
+
     # no regularization term added to returned loss (for monitoring only)
     return float(loss)
 
@@ -37,9 +41,18 @@ def weighted_gradient_logistic(y, tx, w, lambda_=0.0, pos_weight=1.0, neg_weight
     grad[1:] += 2 * lambda_ * w[1:]  # don't regularize bias
     return grad.ravel()
 
+
 def logistic_regression_weighted_gd(
-    y, x, lambda_=1e-3, gamma=0.05, pos_weight=1.0, neg_weight=1.0,
-    max_iter=10000, tol=1e-4, clip_grad=10.0, verbose=True
+    y,
+    x,
+    lambda_=1e-3,
+    gamma=0.05,
+    pos_weight=1.0,
+    neg_weight=1.0,
+    max_iter=10000,
+    tol=1e-4,
+    clip_grad=10.0,
+    verbose=True,
 ):
     """
     Logistic regression with class weights and L2 regularization.
@@ -70,18 +83,21 @@ def logistic_regression_weighted_gd(
 
     return losses[-1], w
 
+
 def predict_with_threshold(x, w, threshold=0.5):
     tx = np.c_[np.ones((x.shape[0], 1)), x]
     probs = sigmoid(tx @ w)
     preds = (probs >= threshold).astype(int)
     return preds, probs
 
-def predict_linear (x, w, threshold = 0.5):
+
+def predict_linear(x, w, threshold=0.5):
 
     tx = np.c_[np.ones((x.shape[0], 1)), x]
-    predictions = x@w
+    predictions = tx @ w
     preds = (predictions >= threshold).astype(int)
-    return preds
+    return preds, predictions
+
 
 def f1_score(y_true, y_pred):
     """
@@ -101,7 +117,6 @@ def f1_score(y_true, y_pred):
     return f1
 
 
-
 # --- Full evaluation wrapper ---
 def evaluate_model(y_true, X, w, threshold=0.5):
     """
@@ -115,21 +130,24 @@ def evaluate_model(y_true, X, w, threshold=0.5):
     print(f" F1 Score: {f1:.4f}")
     return acc, f1
 
+
 def accuracy_numpy(y_true, y_pred):
     """
     Compute accuracy.
     """
     return np.mean(y_true == y_pred)
 
-def recall_numpy (y_true, y_pred):
+
+def recall_numpy(y_true, y_pred):
     tp = np.sum((y_true == 1) & (y_pred == 1))
-    fp = np.sum ((y_true == 0) & (y_pred == 1))
-    fn = np.sum ((y_true == 1) & (y_pred == 0))
+    fp = np.sum((y_true == 0) & (y_pred == 1))
+    fn = np.sum((y_true == 1) & (y_pred == 0))
 
     recall = tp / (tp + fn) if (tp + fn) > 0 else 0.0
     return recall
 
-def confusion_matrix_numpy(y_true, y_pred, method = "Weighted", plot=True):
+
+def confusion_matrix_numpy(y_true, y_pred, method="Weighted", plot=True):
     """
     Compute and optionally plot the confusion matrix using NumPy.
 
@@ -173,7 +191,9 @@ def confusion_matrix_numpy(y_true, y_pred, method = "Weighted", plot=True):
 
         for i in range(2):
             for j in range(2):
-                plt.text(j, i, cm[i, j], ha="center", va="center", color="black", fontsize=12)
+                plt.text(
+                    j, i, cm[i, j], ha="center", va="center", color="black", fontsize=12
+                )
 
         plt.tight_layout()
         plt.show()

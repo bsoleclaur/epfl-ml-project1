@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from scipy.linalg import cho_factor, cho_solve
 from scipy.stats import norm
 
+
 def sigmoid(z):
 
     # Clip z to avoid overflow in exp()
@@ -19,6 +20,7 @@ def remove_nan_feat(X, threshold=0.3):
     keep_mask = nan_per_feature < threshold * X.shape[0]
     return keep_mask
 
+
 def remove_outliers_feat(X, num_mask, threshold_IQR=1.5, threshold_out=0.3):
 
     """
@@ -27,7 +29,7 @@ def remove_outliers_feat(X, num_mask, threshold_IQR=1.5, threshold_out=0.3):
     X_num = X[:, num_mask]
     n, d = X_num.shape
     outlier_mask = np.zeros((n, d), dtype=bool)
-    
+
     for j in range(d):
         col = X_num[:, j]
         col_no_nan = col[~np.isnan(col)]
@@ -40,7 +42,7 @@ def remove_outliers_feat(X, num_mask, threshold_IQR=1.5, threshold_out=0.3):
         upper = q3 + threshold_IQR * iqr
         mask = (col < lower) | (col > upper)
         outlier_mask[:, j] = np.where(np.isnan(col), False, mask)
-    
+
     outlier_counts = np.sum(outlier_mask, axis=0)
     outlier_pctg = outlier_counts / X.shape[0]
 
@@ -98,7 +100,7 @@ def standardize_features(X, num_mask=None, means=None, stds=None):
             Optional predefined stds for numerical features (used for val/test)
 
     Returns:
-    
+
         X_std : np.ndarray
             Standardized copy of X.
         means : np.ndarray
@@ -107,7 +109,8 @@ def standardize_features(X, num_mask=None, means=None, stds=None):
             Standard deviations used for numerical features.
     """
     X_std = X.copy().astype(float)
-    if num_mask is None: num_mask = np.ones(X_std.shape[1], dtype=bool)
+    if num_mask is None:
+        num_mask = np.ones(X_std.shape[1], dtype=bool)
     idx_num = np.where(num_mask)[0]
 
     if means is None or stds is None:
@@ -116,7 +119,6 @@ def standardize_features(X, num_mask=None, means=None, stds=None):
         stds[stds == 0] = 1.0  # avoid division by zero
     X_std[:, idx_num] = (X_std[:, idx_num] - means) / stds
     return X_std, means, stds
-
 
 
 def balance_data(X, y, method="undersample", random_state=None):
@@ -144,11 +146,11 @@ def balance_data(X, y, method="undersample", random_state=None):
     """
     if random_state is not None:
         np.random.seed(random_state)
-    
+
     # Separate indices by class
     idx_0 = np.where(y == 0)[0]
     idx_1 = np.where(y == 1)[0]
-    
+
     n_0, n_1 = len(idx_0), len(idx_1)
 
     if method == "undersample":
@@ -159,7 +161,7 @@ def balance_data(X, y, method="undersample", random_state=None):
         else:
             idx_1_sampled = np.random.choice(idx_1, size=n_0, replace=False)
             balanced_idx = np.concatenate([idx_0, idx_1_sampled])
-    
+
     elif method == "oversample":
         # Upsample minority class
         if n_0 > n_1:
@@ -168,23 +170,24 @@ def balance_data(X, y, method="undersample", random_state=None):
         else:
             idx_0_sampled = np.random.choice(idx_0, size=n_1, replace=True)
             balanced_idx = np.concatenate([idx_0_sampled, idx_1])
-    
+
     else:
         raise ValueError("method must be 'undersample' or 'oversample'")
-    
+
     # Shuffle combined indices
     np.random.shuffle(balanced_idx)
-    
+
     # Return balanced data
     X_bal = X[balanced_idx]
     y_bal = y[balanced_idx]
-    
+
     return X_bal, y_bal
 
 
 # Numerical and categorical features
 
-def impute_numerical(X_imp, num_mask, medians=None, means=None, strategy='medians'):
+
+def impute_numerical(X_imp, num_mask, medians=None, means=None, strategy="medians"):
     """
     Imputes NaN values in numerical features with their medians, means, or samples from a normal distribution.
     If predefined medians or means are provided, they are used instead.
@@ -209,7 +212,7 @@ def impute_numerical(X_imp, num_mask, medians=None, means=None, strategy='median
     """
     idx_num = np.where(num_mask)[0]
 
-    if strategy == 'medians':
+    if strategy == "medians":
         if medians is None:
             values = np.nanmedian(X_imp[:, idx_num], axis=0)
         else:
@@ -225,13 +228,14 @@ def impute_numerical(X_imp, num_mask, medians=None, means=None, strategy='median
         col = X_imp[:, j]
         nan_mask = np.isnan(col)
         if nan_mask.any():
-            if strategy == 'normal':
+            if strategy == "normal":
                 std = np.nanstd(col)
                 col[nan_mask] = np.random.normal(values[i], std, size=nan_mask.sum())
             else:
                 col[nan_mask] = values[i]
             X_imp[:, j] = col
     return X_imp, values
+
 
 def impute_categorical(X, cat_mask, modes=None):
     """
@@ -294,7 +298,7 @@ def one_hot_encode(X, cat_mask, categories=None, drop_first=True):
             If True, drops the first category to avoid collinearity.
 
     Returns:
-    
+
         X_enc : np.ndarray
             Matrix with numerical features kept and categorical features one-hot encoded.
         categories : list of np.ndarray
@@ -324,7 +328,9 @@ def one_hot_encode(X, cat_mask, categories=None, drop_first=True):
     X_enc = np.hstack(X_enc_parts).astype(float)
     return X_enc, categories
 
+
 # Correlation elimination functions´
+
 
 def feature_target_correlation(X, y, threshold_elimination=0.01):
     """
@@ -348,7 +354,7 @@ def feature_target_correlation(X, y, threshold_elimination=0.01):
     Xc = X - np.mean(X, axis=0)
     yc = y - np.mean(y)
     num = np.sum(Xc * yc[:, None], axis=0)
-    denom = np.sqrt(np.sum(Xc ** 2, axis=0) * np.sum(yc ** 2))
+    denom = np.sqrt(np.sum(Xc**2, axis=0) * np.sum(yc**2))
     corr = np.zeros(X.shape[1])
     valid = denom > 0
     corr[valid] = num[valid] / denom[valid]
@@ -357,34 +363,34 @@ def feature_target_correlation(X, y, threshold_elimination=0.01):
     mask = np.abs(corr) >= threshold_elimination
     return mask
 
-def target_correlations (X, y):
+
+def target_correlations(X, y):
     """Computes Pearson correlation between each feature and the target y
-        and returns a boolean mask indicating features with |correlation| above threshold.
-    
-        Parameters
-        ----------
-        X : np.ndarray
-            Data matrix (n_samples, n_features)
-        y : np.ndarray
-            Target vector (n_samples,)
-        threshold_elimination : float
-            Threshold below which features are considered uncorrelated
-    
-        Returns
-        -------
-        mask : np.ndarray
-            Boolean array of length n_features (1 if |corr| >= threshold, 0 otherwise)
-        """
+    and returns a boolean mask indicating features with |correlation| above threshold.
+
+    Parameters
+    ----------
+    X : np.ndarray
+        Data matrix (n_samples, n_features)
+    y : np.ndarray
+        Target vector (n_samples,)
+    threshold_elimination : float
+        Threshold below which features are considered uncorrelated
+
+    Returns
+    -------
+    mask : np.ndarray
+        Boolean array of length n_features (1 if |corr| >= threshold, 0 otherwise)
+    """
     Xc = X - np.mean(X, axis=0)
     yc = y - np.mean(y)
     num = np.sum(Xc * yc[:, None], axis=0)
-    denom = np.sqrt(np.sum(Xc ** 2, axis=0) * np.sum(yc ** 2))
+    denom = np.sqrt(np.sum(Xc**2, axis=0) * np.sum(yc**2))
     corr = np.zeros(X.shape[1])
     valid = denom > 0
     corr[valid] = num[valid] / denom[valid]
     return corr
 
-    
 
 def correlation_matrix(X):
     """
@@ -410,17 +416,17 @@ def correlation_matrix(X):
 
 def tvalues_logreg_penalized(w, X, y, lam, pos_weight=1.0, neg_weight=1.0):
     n, d = X.shape
-    w = w.reshape(-1,1)
-    y = y.reshape(-1,1)
-    Xb = np.hstack([np.ones((n,1)), X])
+    w = w.reshape(-1, 1)
+    y = y.reshape(-1, 1)
+    Xb = np.hstack([np.ones((n, 1)), X])
     z = Xb @ w
     p = 1 / (1 + np.exp(-z))
-    sample_w = np.where(y == 1, pos_weight, neg_weight).reshape(-1,1)
+    sample_w = np.where(y == 1, pos_weight, neg_weight).reshape(-1, 1)
     w_diag = (p * (1 - p) * sample_w).flatten()
     H_diag = np.sum(Xb**2 * w_diag[:, None], axis=0) + lam
     se = 1 / np.sqrt(H_diag)
-    t_vals = (w.flatten() / se)
-    return ((t_vals[1:] > 2) | (t_vals[1:] < -2))
+    t_vals = w.flatten() / se
+    return (t_vals[1:] > 2) | (t_vals[1:] < -2)
 
 
 def filter_colinear_features(X, y, threshold=0.9):
@@ -440,7 +446,7 @@ def filter_colinear_features(X, y, threshold=0.9):
         Boolean mask indicating which features to keep (True) and which to drop (False).
     """
     corr_mat = correlation_matrix(X)
-    corr = target_correlations (X, y)
+    corr = target_correlations(X, y)
     d = X.shape[1]
     keep_mask = np.ones(d, dtype=bool)
 
@@ -451,7 +457,7 @@ def filter_colinear_features(X, y, threshold=0.9):
             if not keep_mask[j]:
                 continue
             if abs(corr_mat[i, j]) > threshold:
-                if (abs(corr[i]) >= abs(corr[j])):
+                if abs(corr[i]) >= abs(corr[j]):
                     keep_mask[j] = False
                 else:
                     keep_mask[i] = False

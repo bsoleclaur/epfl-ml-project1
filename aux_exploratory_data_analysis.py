@@ -1,10 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-def split_data(x, y, ratiotrain =0.7, ratiovalidation=0.15, seed=1):
+
+def split_data(x, y, ratiotrain=0.7, ratiovalidation=0.15, seed=1):
 
     """Split the dataset based on the split ratio (e.g. 0.8 for 80% train, 20% test).
-    
+
     Parameters
     ----------
     x : np.ndarray
@@ -34,29 +35,35 @@ def split_data(x, y, ratiotrain =0.7, ratiovalidation=0.15, seed=1):
         Test target values
     """
 
-    
-
     # Set seed for reproducibility
     np.random.seed(seed)
-    
+
     num_samples = len(y)
     indices = np.random.permutation(num_samples)
-    
+
     # Calculate split boundary index
     train_boundary = int(np.floor(ratiotrain * num_samples))
     validation_boundary = int(np.floor((ratiotrain + ratiovalidation) * num_samples))
-    
+
     train_indices = indices[:train_boundary]
     validation_indices = indices[train_boundary:validation_boundary]
     test_indices = indices[validation_boundary:]
-    
-    x_train, x_validation, x_test = x[train_indices], x[validation_indices], x[test_indices]
-    y_train, y_validation, y_test = y[train_indices], y[validation_indices], y[test_indices]
+
+    x_train, x_validation, x_test = (
+        x[train_indices],
+        x[validation_indices],
+        x[test_indices],
+    )
+    y_train, y_validation, y_test = (
+        y[train_indices],
+        y[validation_indices],
+        y[test_indices],
+    )
 
     return x_train, x_validation, x_test, y_train, y_validation, y_test
 
 
-#NaN analysis
+# NaN analysis
 def nan_count(X, plot=False):
     """
     Counts the number and percentage of NaN values per column.
@@ -81,16 +88,17 @@ def nan_count(X, plot=False):
     nan_pctg = nan_number / n * 100
 
     if plot:
-        plt.figure(figsize=(6,4))
-        plt.hist(nan_number, bins=100, edgecolor='black')
-        plt.xlabel('Number of NaN values per column')
-        plt.ylabel('Count of features')
-        plt.title('NaN distribution across features')
+        plt.figure(figsize=(6, 4))
+        plt.hist(nan_number, bins=100, edgecolor="black")
+        plt.xlabel("Number of NaN values per column")
+        plt.ylabel("Count of features")
+        plt.title("NaN distribution across features")
         plt.show()
 
     return nan_number, nan_pctg
 
-#Detecting categorical and numerical features, to treat them differently
+
+# Detecting categorical and numerical features, to treat them differently
 def detect_categorical_features(X, max_unique=30):
     """
     Detects categorical columns in a numeric NumPy array.
@@ -122,7 +130,8 @@ def detect_categorical_features(X, max_unique=30):
     return cat_mask, num_mask
 
 
-#Calculation of basic stats of the data
+# Calculation of basic stats of the data
+
 
 def summarize_basic(X, cat_mask):
     """
@@ -165,10 +174,11 @@ def summarize_basic(X, cat_mask):
         "min": mins,
         "max": maxs,
         "median": medians,
-        "mode": modes
+        "mode": modes,
     }
 
     return stats
+
 
 def show_feature_stats(stats, j):
     print(f"Feature {j}")
@@ -180,7 +190,8 @@ def show_feature_stats(stats, j):
     print(f"  Mode:   {stats['mode'][j]}")
 
 
-#Plot features
+# Plot features
+
 
 def plot_feature_distribution(X, cat_mask, feature_index, bins=30):
     """
@@ -204,21 +215,23 @@ def plot_feature_distribution(X, cat_mask, feature_index, bins=30):
         # Bar plot for categorical feature
         values, counts = np.unique(col, return_counts=True)
         plt.figure(figsize=(6, 4))
-        plt.bar(values, counts, edgecolor='black')
-        plt.xlabel(f'Feature {feature_index} (categorical)')
-        plt.ylabel('Count')
-        plt.title(f'Distribution of feature {feature_index}')
+        plt.bar(values, counts, edgecolor="black")
+        plt.xlabel(f"Feature {feature_index} (categorical)")
+        plt.ylabel("Count")
+        plt.title(f"Distribution of feature {feature_index}")
         plt.show()
     else:
         # Histogram for numerical feature
         plt.figure(figsize=(6, 4))
-        plt.hist(col, bins=bins, edgecolor='black')
-        plt.xlabel(f'Feature {feature_index} (numerical)')
-        plt.ylabel('Frequency')
-        plt.title(f'Distribution of feature {feature_index}')
+        plt.hist(col, bins=bins, edgecolor="black")
+        plt.xlabel(f"Feature {feature_index} (numerical)")
+        plt.ylabel("Frequency")
+        plt.title(f"Distribution of feature {feature_index}")
         plt.show()
-        
-#Outlier detection
+
+
+# Outlier detection
+
 
 def detect_outliers(X, num_mask, threshold=1.5, plot=False):
     """
@@ -263,14 +276,15 @@ def detect_outliers(X, num_mask, threshold=1.5, plot=False):
 
     if plot:
         plt.figure(figsize=(6, 4))
-        plt.bar(np.arange(d), outlier_counts, edgecolor='black')
-        plt.xlabel('Numerical feature index')
-        plt.ylabel('Number of outliers')
-        plt.title(f'Outliers per feature (threshold = {threshold} × IQR)')
+        plt.bar(np.arange(d), outlier_counts, edgecolor="black")
+        plt.xlabel("Numerical feature index")
+        plt.ylabel("Number of outliers")
+        plt.title(f"Outliers per feature (threshold = {threshold} × IQR)")
         plt.tight_layout()
         plt.show()
 
     return outlier_mask, outlier_counts
+
 
 def summarize_outliers(outlier_mask, num_mask, plot=False):
     """
@@ -297,12 +311,11 @@ def summarize_outliers(outlier_mask, num_mask, plot=False):
     if plot:
         d = len(outlier_pctg)
         plt.figure(figsize=(6, 4))
-        plt.bar(np.arange(d), outlier_pctg, edgecolor='black')
-        plt.xlabel('Numerical feature index')
-        plt.ylabel('Outlier percentage (%)')
-        plt.title('Percentage of outliers per numerical feature')
+        plt.bar(np.arange(d), outlier_pctg, edgecolor="black")
+        plt.xlabel("Numerical feature index")
+        plt.ylabel("Outlier percentage (%)")
+        plt.title("Percentage of outliers per numerical feature")
         plt.tight_layout()
         plt.show()
 
     return outlier_pctg
-
